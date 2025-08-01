@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arasaka Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    canvas#bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    #blackout {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      z-index: 50;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      pointer-events: none;
+    }
+    #blackout.active {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="bg-black text-white flex items-center justify-center min-h-screen font-sans overflow-hidden">
+  <canvas id="bg"></canvas>
+  <div id="blackout"></div>
+
+  <div class="bg-[#1a1a1a] border border-red-600 p-8 rounded-2xl shadow-lg w-full max-w-sm space-y-6 z-10">
+    <!-- Arasaka Logo or Title -->
+    <div class="text-center">
+      <h1 class="text-3xl font-bold text-red-600 tracking-widest">ARASAKA</h1>
+      <p class="text-sm text-gray-400 mt-1">Secure Access Terminal</p>
+    </div>
+
+    <!-- Login Form -->
+    <form class="space-y-5" id="login-form">
+      <div>
+        <label class="block mb-1 text-gray-300">Username</label>
+        <input type="text" class="w-full px-4 py-2 rounded-md bg-black border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Enter your ID" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-300">Password</label>
+        <input type="password" class="w-full px-4 py-2 rounded-md bg-black border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="••••••••" />
+      </div>
+
+      <button type="submit" class="w-full py-2 bg-red-600 hover:bg-red-700 rounded-md font-bold tracking-wide transition duration-200">
+        ACCESS
+      </button>
+    </form>
+
+    <!-- Footer -->
+    <div class="text-center text-xs text-gray-600">
+      © 2025 Arasaka Corporation. All rights reserved.
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d");
+    let width, height;
+
+    const nodes = [];
+    const numNodes = 100;
+    const maxDistance = 100;
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+
+    for (let i = 0; i < numNodes; i++) {
+      nodes.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      for (let i = 0; i < numNodes; i++) {
+        let n1 = nodes[i];
+        n1.x += n1.vx;
+        n1.y += n1.vy;
+
+        if (n1.x < 0 || n1.x > width) n1.vx *= -1;
+        if (n1.y < 0 || n1.y > height) n1.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(n1.x, n1.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = "#ff0000";
+        ctx.fill();
+
+        for (let j = i + 1; j < numNodes; j++) {
+          let n2 = nodes[j];
+          let dx = n1.x - n2.x;
+          let dy = n1.y - n2.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < maxDistance) {
+            ctx.beginPath();
+            ctx.moveTo(n1.x, n1.y);
+            ctx.lineTo(n2.x, n2.y);
+            ctx.strokeStyle = `rgba(255, 0, 0, ${1 - dist / maxDistance})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    const loginForm = document.getElementById("login-form");
+    const blackout = document.getElementById("blackout");
+
+    loginForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      blackout.classList.add("active");
+
+      // Optional: Simulate a delay before redirect
+      setTimeout(() => {
+        alert("Access granted.");
+        // window.location.href = "dashboard.html";
+      }, 1500);
+    });
+  </script>
+</body>
+</html>
